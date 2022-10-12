@@ -1,0 +1,29 @@
+.flex-container {
+    display: flex;
+  }
+  
+  .x-wrapper {
+    background-color: black;
+    height: 100px;
+    width: 100px;
+    min-height: 100px;
+    min-width: 100px;
+  }
+  
+  .x {
+    clip-path: url(#clipx);
+    background-color: white;
+    position: absolute;
+  }
+  
+  a:hover.x {
+    background-color: yellow;
+  }
+  
+  .o a {
+    fill: black;
+  }
+  
+  .o a:hover {
+    fill: yellow;
+  }
