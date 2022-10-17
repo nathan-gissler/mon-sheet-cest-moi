@@ -1,0 +1,9 @@
+{
+    "id": "6516518",
+    "name": "Test de sauvegarde",
+    "lastSaver": "Jean-Michel",
+    "sharedWith": ["Albert","Catherine","Suzette"],
+    "musicSheet": {
+        "notes" : ["do5","do5","do5","re5","mi5","re5","do5","mi5","re5","re5","do5"]
+    }
+}
