@@ -2,10 +2,8 @@ const canvas = document.getElementById('score');
 const ctx = canvas.getContext('2d');
 const staffLineSpacing = 20;
 const symbolSpacing = 20;
-const imgRatio = {"whole_note": 320/176, "treble_clef": 87/238, "time_signature_4": 348/480, "time_signature_4_4": 134/329, "whole_rest": 232/479};
-
-ctx.fillStyle = 'white';
-ctx.fillRect(0, 0, 800, 500);
+const barCount = 7;
+const imgRatio = {"whole_note": 320/176, "treble_clef": 87/238, "time_signature_4_4": 134/329, "whole_rest": 232/479};
 
 /* pour créer une ligne avec des coordonnées */
 class Line {
@@ -124,6 +122,8 @@ class NoteFigure {
     }
 }
 
+let wholeNote = new NoteFigure("whole_note");
+
 /* hauteur de note (la4, ré#3...) avec la fréquence et la hauteur sur la portée correspondantes */
 class NoteValue {
     constructor(name, octave, alteration, frequency, vertPlaceInStaff) {
@@ -134,6 +134,31 @@ class NoteValue {
         this.vertPlaceInStaff = vertPlaceInStaff;
     }
 }
+
+/* création d'une liste de hauteurs de notes que l'on pourra utiliser */
+const allNoteValues = [];
+let re4 = new NoteValue("D", 4, "natural", 293.66, 8);
+allNoteValues.push(re4);
+let mi4 = new NoteValue("E", 4, "natural", 329.63, 7);
+allNoteValues.push(mi4);
+let fa4 = new NoteValue("F", 4, "natural", 349.23, 6);
+allNoteValues.push(fa4);
+let sol4 = new NoteValue("G", 4, "natural", 392, 5);
+allNoteValues.push(sol4);
+let la4 = new NoteValue("A", 4, "natural", 440, 4);
+allNoteValues.push(la4);
+let si4 = new NoteValue("B", 4, "natural", 493.88, 3);
+allNoteValues.push(si4);
+let do5 = new NoteValue("C", 5, "natural", 523.25, 2);
+allNoteValues.push(do5);
+let re5 = new NoteValue("D", 5, "natural", 587.33, 1);
+allNoteValues.push(re5);
+let mi5 = new NoteValue("E", 5, "natural", 659.25, 0);
+allNoteValues.push(mi5);
+let fa5 = new NoteValue("F", 5, "natural", 698.46, -1);
+allNoteValues.push(fa5);
+let sol5 = new NoteValue("G", 5, "natural", 783.99, -2);
+allNoteValues.push(sol5);
 
 /* une note qui pourra être placée sur la portée, on lui attribue une figure de note (durée) et une hauteur */
 class Note {
@@ -191,6 +216,9 @@ class Rest {
     }
 }
 
+
+let wholeRest = new RestFigure("whole_rest");
+
 /* une portée qui pourra être affichée dans le canvas */
 class Staff {
     constructor(xpos, ypos, length, lineSpacing = staffLineSpacing) {
@@ -209,11 +237,10 @@ class Staff {
         /* symboles qui apparaissent sur la portée au départ */
         this.addClef("treble_clef");
         this.addTimeSignature("time_signature_4_4");
-        let wholeRest = new RestFigure("whole_rest");
-        this.addRest(wholeRest);
-        this.addBarLine();
-        this.addRest(wholeRest);
-        this.addBarLine();
+        for (let i = 0; i < barCount; i++) {
+            this.addRest(wholeRest);
+            this.addBarLine();
+        }
     }
 
     draw(ctx) {
@@ -245,9 +272,14 @@ class Staff {
         this.addSymbol(barLine);
     }
 
-    addNote(noteFigure, noteValue) {
+    addNoteAncien(noteFigure, noteValue) {
         let note = new Note(noteFigure, noteValue, this, this.horPlaceForNextSymbol);
         this.addSymbol(note);
+    }
+
+    addNote(noteFigure, noteValue, idxInStaff) {
+        let note = new Note(noteFigure, noteValue, this, this.symbols[idxInStaff].horPlaceInStaff);
+        this.replaceSymbol(note, idxInStaff);
     }
 
     addRest(restFigure) {
@@ -262,20 +294,33 @@ class Staff {
         this.drawSymbol(symbol, ctx);
     }
 
+    /* supprime la note se trouvant à l'indice donné en la remplaçant par un silence */
+    deleteNote(idxInStaff) {
+        let rest = new Rest(wholeRest, this, this.symbols[idxInStaff].horPlaceInStaff);
+        this.replaceSymbol(rest, idxInStaff);
+    }
+
     /* affichage d'un symbole */
     drawSymbol(symbol, ctx) {
         symbol.draw(ctx);
     }
 
     /* suppression d'un symbole */
-    deleteSymbol(i) {
-        /* mise à jour de l'emplacement du prochain symbole */
-        this.horPlaceForNextSymbol -= this.symbols[i].width + symbolSpacing;
+    deleteSymbol(idxInStaff) {
         /* suppression du symbole de la liste */
-        this.symbols.splice(i, 1);
+        this.symbols.splice(idxInStaff, 1);
+        this.updatePositionOfLastSymbols(idxInStaff)
+    }
 
-        /* mise à jour des positions des symboles suivants */
-        for (let j = i; j < this.symbols.length; j++) {
+    /* remplace un symbole de la portée par un symbole donné */
+    replaceSymbol(symbol, idxInStaff) {
+        this.symbols[idxInStaff] = symbol;
+        this.updatePositionOfLastSymbols(idxInStaff);
+    }
+
+    /* mise à jour des positions des symboles à partir de l'indice fromIdx */
+    updatePositionOfLastSymbols(fromIdx) {
+        for (let j = fromIdx; j < this.symbols.length; j++) {
             let previousSymbol = this.symbols[j-1];
             let symbol = this.symbols[j];
             if (j == 0) {
@@ -288,8 +333,13 @@ class Staff {
         /* on efface le canvas et on réaffiche la portée */
         ctx.clearRect(0, 0, ctx.canvas.width, ctx.canvas.height);
         this.draw(ctx);
+        /* mise à jour de l'emplacement du prochain symbole */
+        let lastSymbol = this.symbols[this.symbols.length - 1];
+        this.horPlaceForNextSymbol = lastSymbol.horPlaceInStaff + lastSymbol.width + symbolSpacing;
     }
 }
+
+const myStaff = new Staff(50, 110, 700);
 
 /* mode (ajout / suppression de notes) */
 class Mode {
@@ -307,44 +357,23 @@ class Mode {
     }
 }
 
-const myStaff = new Staff(50, 110, 700);
-
-let wholeNote = new NoteFigure("whole_note");
-
-/* création d'une liste de hauteurs de notes que l'on pourra utiliser */
-const allNoteValues = [];
-let re4 = new NoteValue("D", 4, "natural", 293.66, 8);
-allNoteValues.push(re4);
-let mi4 = new NoteValue("E", 4, "natural", 329.63, 7);
-allNoteValues.push(mi4);
-let fa4 = new NoteValue("F", 4, "natural", 349.23, 6);
-allNoteValues.push(fa4);
-let sol4 = new NoteValue("G", 4, "natural", 392, 5);
-allNoteValues.push(sol4);
-let la4 = new NoteValue("A", 4, "natural", 440, 4);
-allNoteValues.push(la4);
-let si4 = new NoteValue("B", 4, "natural", 493.88, 3);
-allNoteValues.push(si4);
-let do5 = new NoteValue("C", 5, "natural", 523.25, 2);
-allNoteValues.push(do5);
-let re5 = new NoteValue("D", 5, "natural", 587.33, 1);
-allNoteValues.push(re5);
-let mi5 = new NoteValue("E", 5, "natural", 659.25, 0);
-allNoteValues.push(mi5);
-let fa5 = new NoteValue("F", 5, "natural", 698.46, -1);
-allNoteValues.push(fa5);
-let sol5 = new NoteValue("G", 5, "natural", 783.99, -2);
-allNoteValues.push(sol5);
-
 const mode = new Mode();
 
 /* ajoute une note ou non en fonction de la position du clic */
 function addNoteOnClick(x, y) {
-    if (x > myStaff.xpos + myStaff.horPlaceForNextSymbol && x < myStaff.xpos + myStaff.horPlaceForNextSymbol + wholeNote.width) {
-        for (let i = 0; i < allNoteValues.length; i++) {
-            let yposInStaff = y - myStaff.ypos - staffLineSpacing/2;
-            if (( yposInStaff > (allNoteValues[i].vertPlaceInStaff - 1/2) * staffLineSpacing/2) && (yposInStaff < (allNoteValues[i].vertPlaceInStaff + 1/2) * staffLineSpacing/2)) {
-                myStaff.addNote(wholeNote, allNoteValues[i]);
+    /* on parcourt les symboles de la portée pour trouver lequel est potentiellement à remplacer */
+    for (let idxInStaff = 0; idxInStaff < myStaff.symbols.length; idxInStaff++) {
+        let symbol = myStaff.symbols[idxInStaff];
+        let xLeft = symbol.xpos;
+        let xRight = symbol.xpos + symbol.width;
+        let isNoteOrRest = symbol instanceof Note || symbol instanceof Rest;
+        if (x > xLeft && x < xRight && isNoteOrRest) {
+            /* on parcourt toutes les hauteurs de notes pour savoir quelle note doit être créée après le clic */
+            for (let i = 0; i < allNoteValues.length; i++) {
+                let yposInStaff = y - myStaff.ypos - staffLineSpacing/2;
+                if (( yposInStaff > (allNoteValues[i].vertPlaceInStaff - 1/2) * staffLineSpacing/2) && (yposInStaff < (allNoteValues[i].vertPlaceInStaff + 1/2) * staffLineSpacing/2)) {
+                    myStaff.addNote(wholeNote, allNoteValues[i], idxInStaff);
+                }
             }
         }
     }
@@ -354,10 +383,10 @@ function addNoteOnClick(x, y) {
 function deleteNoteOnClick(x, y) {
     for (let i = 0; i < myStaff.symbols.length; i++) {
         let symbol = myStaff.symbols[i];
-        /*if (symbol.classList.contains("Note")) {*/
+        if (symbol instanceof Note) {
             if ((x > symbol.xpos) && (x < symbol.xpos + symbol.width) && (y > symbol.ypos) && (y < symbol.ypos + symbol.height)) {
-                myStaff.deleteSymbol(i);
-            /*}*/
+                myStaff.deleteNote(i);
+            }
         }
     }
 }
