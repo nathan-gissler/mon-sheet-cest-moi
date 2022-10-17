@@ -1,0 +1,41 @@
+<!DOCTYPE html>
+<html>
+<head>
+    <meta charset="utf-8" />
+    <title>TEST</title>
+    <link rel="stylesheet" href="style.css" />
+</head>
+<body>
+    <div>
+      <ul id="listuser">
+        <h3> All users here: </h3>
+      </ul> 
+    </div>
+    
+  <form onsubmit="return false"><div class="container"><label for="uname"><b>Username</b></label>
+  <input type="text" placeholder="Enter Username" id= "uname" name="uname" required><label for="psw"><b>Password</b></label>
+  <input type="password" placeholder="Enter Password" id="psw" name="psw" required><button type="submit" onclick="Login()">Login</button>
+      
+  </div>
+  </form>
+  <script>
+    var a = new Array();
+    function Login()
+{
+
+var username = document.getElementById("uname").value;
+var password = document.getElementById("psw").value;
+
+localStorage.setItem('all_users',JSON.stringify(a));
+a=JSON.parse((localStorage.getItem("all_users")));
+a.push({name: username, password: password});localStorage.setItem('name',JSON.stringify(a));
+for(var i=0; i<a.length; i++)
+  {
+   var li = document.createElement("li");
+   li.innerHTML=a[i]['name'];
+   document.getElementById("listuser").appendChild(li);
+  }
+}
+  </script>
+  </body>
+  </html>
