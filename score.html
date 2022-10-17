@@ -2,10 +2,36 @@
 <html>
     <head>
         <meta charset="utf-8" />
-        <title>Ma partition</title>
+        <title>Mon sheet c'est moi - Ma partition</title>
+        <link rel="stylesheet" href="style.css">
     </head>
     <body>
-        <canvas id="score" width="800" height="500"></canvas>
+        <header>
+            <h1>Ma partition</h1>
+        </header>
+        <nav>
+            <div>
+                <img src="img/home.png" alt="home" class="nav_icon">
+                <p>Accueil</p>
+            </div>
+            <div>
+                <img src="img/saved_scores.png" alt="saved_scores" class="nav_icon">
+                <p>Partitions sauvegardées</p>
+            </div>
+            <div>
+                <img src="img/plus.png" alt="new_score" class="nav_icon">
+                <p>Nouvelle partition</p>
+            </div>
+        </nav>
+        <section>
+            <canvas id="score" width="800" height="500"></canvas>
+        </section>
+        <aside>
+            <p>a - Mode "Add Note"</p>
+            <p>d - Mode "Delete Note"</p>
+            <p>Cliquer pour éditer</p>
+        </aside>
+        <footer>Mon sheet c'est moi - Editeur de partition en ligne</footer>
     </body>
     <script src="score.js"></script>
 </html>

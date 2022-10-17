@@ -221,7 +221,7 @@ let wholeRest = new RestFigure("whole_rest");
 
 /* une portée qui pourra être affichée dans le canvas */
 class Staff {
-    constructor(xpos, ypos, length, lineSpacing = staffLineSpacing) {
+    constructor(xpos, ypos, length, lineSpacing = staffLineSpacing, symbolList = []) {
         this.xpos = xpos;
         this.ypos = ypos;
         this.length = length;
@@ -233,13 +233,11 @@ class Staff {
         this.horPlaceForNextSymbol = 0;
 
         this.draw(ctx);
-
-        /* symboles qui apparaissent sur la portée au départ */
-        this.addClef("treble_clef");
-        this.addTimeSignature("time_signature_4_4");
-        for (let i = 0; i < barCount; i++) {
-            this.addRest(wholeRest);
-            this.addBarLine();
+        if (symbolList.length == 0) {
+            this.initEmpty();
+        }
+        else {
+            this.fromJson(symbolList);
         }
     }
 
@@ -272,14 +270,15 @@ class Staff {
         this.addSymbol(barLine);
     }
 
-    addNoteAncien(noteFigure, noteValue) {
-        let note = new Note(noteFigure, noteValue, this, this.horPlaceForNextSymbol);
-        this.addSymbol(note);
-    }
-
-    addNote(noteFigure, noteValue, idxInStaff) {
-        let note = new Note(noteFigure, noteValue, this, this.symbols[idxInStaff].horPlaceInStaff);
-        this.replaceSymbol(note, idxInStaff);
+    addNote(noteFigure, noteValue, idxInStaff = -1) {
+        if (idxInStaff == -1) {
+            let note = new Note(noteFigure, noteValue, this, this.horPlaceForNextSymbol);
+            this.addSymbol(note);
+        }
+        else {
+            let note = new Note(noteFigure, noteValue, this, this.symbols[idxInStaff].horPlaceInStaff);
+            this.replaceSymbol(note, idxInStaff);
+        }
     }
 
     addRest(restFigure) {
@@ -337,9 +336,74 @@ class Staff {
         let lastSymbol = this.symbols[this.symbols.length - 1];
         this.horPlaceForNextSymbol = lastSymbol.horPlaceInStaff + lastSymbol.width + symbolSpacing;
     }
+
+    initEmpty() {
+        /* symboles qui apparaissent sur la portée au départ */
+        this.addClef("treble_clef");
+        this.addTimeSignature("time_signature_4_4");
+        for (let i = 0; i < barCount; i++) {
+            this.addRest(wholeRest);
+            this.addBarLine();
+        }
+    }
+
+    fromJson(symbolList) {
+        for (let i = 0; i < symbolList.length; i++) {
+            let nextSymbol = symbolList[i];
+            if (nextSymbol["type"] == "clef") {
+                this.addClef(nextSymbol["name"]);
+                console.log(this.symbols);
+            }
+            if (nextSymbol["type"] == "timeSignature") {
+                this.addTimeSignature(nextSymbol["name"]);
+            }
+            if (nextSymbol["type"] == "barLine") {
+                this.addBarLine();
+            }
+            if (nextSymbol["type"] == "note") {
+                let noteValue = allNoteValues[0];
+                for (let j = 0; j < allNoteValues.length; j++) {
+                    if (allNoteValues[j].name == nextSymbol["noteValueName"] && allNoteValues[j].octave == nextSymbol["octave"] && allNoteValues[j].alteration == nextSymbol["alteration"]) {
+                        noteValue = allNoteValues[j];
+                    }
+                }
+                this.addNote(wholeNote, noteValue);
+            }
+            if (nextSymbol["type"] == "rest") {
+                this.addRest(wholeRest);
+            }
+        }
+    }
+
+    toJson() {
+        let symbolList = [];
+        for (let i = 0; i < this.symbols.length; i++) {
+            let symbol = this.symbols[i];
+            console.log(symbol);
+            if (symbol instanceof Clef) {
+                symbolList.push({"type": "clef", "name": symbol.name})
+            }
+            if (symbol instanceof TimeSignature) {
+                symbolList.push({"type": "timeSignature", "name": symbol.name})
+            }
+            if (symbol instanceof BarLine) {
+                symbolList.push({"type": "barLine"})
+            }
+            if (symbol instanceof Note) {
+                symbolList.push({"type": "note", "noteFigure": symbol.noteFigure.name, "noteValueName": symbol.noteValue.name, "octave": symbol.noteValue.octave, "alteration": symbol.noteValue.alteration})
+            }
+            if (symbol instanceof Rest) {
+                symbolList.push({"type": "rest", "restFigure": symbol.restFigure.name})
+            }
+        }
+        return symbolList
+    }
 }
 
 const myStaff = new Staff(50, 110, 700);
+/*const myStaff = new Staff(50, 110, 700, 20, [{"type": "clef", "name": "treble_clef"}, {"type": "barLine"}, {"type": "note", "noteFigure": "wholeNote", "noteValueName": "G", "octave": 4, "alteration": "natural"}]);
+let symbolList = myStaff.toJson();
+const otherStaff = new Staff(50, 300, 700, 20, symbolList);*/
 
 /* mode (ajout / suppression de notes) */
 class Mode {
