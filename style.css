@@ -1,3 +1,7 @@
+.nav_icon
+{
+    height: 36px;
+}
 body {
   display: flex;
 }
@@ -106,4 +110,3 @@ time {
   .tag + .tag {
     margin-left: 10px;
   }
-}
