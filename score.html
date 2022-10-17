@@ -5,7 +5,13 @@
         <title>Ma partition</title>
     </head>
     <body>
+        <form onsubmit="return false"><div class="container">
+            <label for="SName"><b>Nom de la partition:</b></label>
+            <input placeholder="Entrez le nom" id="SName" name="SName" required><button type="submit" onclick="Save()">Sauvegarder</button>
+            </div>
+            </form>
         <canvas id="score" width="800" height="500"></canvas>
     </body>
     <script src="score.js"></script>
+    <script src="saves.js"></script>
 </html>
