@@ -1,0 +1,59 @@
+header {
+    display: flex;
+    /*border-bottom: 2px dotted black;*/
+    box-shadow: 2px 2px 2px 2px;
+}
+
+h1 {
+    margin: auto;
+    margin-top: 20px;
+    margin-bottom: 25px;
+    border: 3px;
+}
+
+.nav_icon {
+    height: 30px;
+    margin: 10px;
+}
+
+.nav_button {
+    display: flex;
+    margin: 10px;
+}
+
+nav {
+    margin-top: 30px;
+    border-width: 3px;
+    border-color: black;
+    border-radius: 20%;
+    box-shadow: 2px 2px 2px 2px;
+}
+
+aside,
+form {
+    margin: 10px;
+}
+
+label,
+input,
+button {
+    margin: 5px;
+}
+
+#left_div {
+    display: flex;
+    flex-direction: column;
+}
+
+#global_div {
+    display: flex;
+    flex-direction: row;
+}
+
+footer {
+    display: flex;
+}
+
+#footer_text {
+    margin: auto;
+}
