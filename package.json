@@ -1,0 +1,22 @@
+{
+  "name": "mon-sheet-cest-moi",
+  "version": "1.0.0",
+  "description": "Site web permettant d'écrire de la musique sur une partition intéractive.",
+  "main": "index.js",
+  "scripts": {
+    "test": "echo \"Error: no test specified\" && exit 1"
+  },
+  "repository": {
+    "type": "git",
+    "url": "git+https://github.com/nathan-gissler/mon-sheet-cest-moi.git"
+  },
+  "author": "",
+  "license": "ISC",
+  "bugs": {
+    "url": "https://github.com/nathan-gissler/mon-sheet-cest-moi/issues"
+  },
+  "homepage": "https://github.com/nathan-gissler/mon-sheet-cest-moi#readme",
+  "dependencies": {
+    "express": "^4.18.2"
+  }
+}
