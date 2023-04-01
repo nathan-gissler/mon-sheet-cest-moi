@@ -1,0 +1,54 @@
+<!DOCTYPE html>
+<html>
+
+<head>
+    <meta charset="utf-8" />
+    <title>Mon sheet c'est moi - Ma partition</title>
+    <link rel="stylesheet" href="style_score.css">
+</head>
+
+<body>
+    <header>
+        <h1>Ma partition</h1>
+    </header>
+    <div id="global_div">
+        <div id="left_div">
+            <nav>
+                <a href="home.html" class="nav_button">
+                    <img src="img/home.png" alt="home" class="nav_icon">
+                    <p>Accueil</p>
+                </a>
+                <a href="saves.html" class="nav_button">
+                    <img src="img/saved_scores.png" alt="saved_scores" class="nav_icon">
+                    <p>Partitions sauvegardées</p>
+                </a>
+                <a href="score.html" class="nav_button">
+                    <img src="img/plus.png" alt="new_score" class="nav_icon">
+                    <p>Nouvelle partition</p>
+                </a>
+            </nav>
+            <aside>
+                <p>a - Mode "Add Note"</p>
+                <p>d - Mode "Delete Note"</p>
+                <p>Cliquer pour éditer</p>
+            </aside>
+            <form onsubmit="return false">
+                <div class="container">
+                    <label for="SName"><b>Nom de la partition:</b><br></label>
+                    <input placeholder="Entrez le nom" id="SName" name="SName" required><br><button type="submit"
+                        onclick="Save()">Sauvegarder</button>
+                </div>
+            </form>
+        </div>
+        <section>
+            <canvas id="score" width="800" height="500"></canvas>
+        </section>
+    </div>
+    <footer>
+        <p id="footer_text">Mon sheet c'est moi - Editeur de partition en ligne</p>
+    </footer>
+</body>
+<script src="scoresave.js"></script>
+<script src="saves.js"></script>
+
+</html>

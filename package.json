@@ -4,7 +4,9 @@
   "description": "Site web permettant d'écrire de la musique sur une partition intéractive.",
   "main": "index.js",
   "scripts": {
-    "test": "echo \"Error: no test specified\" && exit 1"
+    "test": "echo \"Error: no test specified\" && exit 1",
+    "start": "node -r dotenv/config server.js",
+    "dev": "nodemon -r dotenv/config server.js"
   },
   "repository": {
     "type": "git",
@@ -17,6 +19,16 @@
   },
   "homepage": "https://github.com/nathan-gissler/mon-sheet-cest-moi#readme",
   "dependencies": {
-    "express": "^4.18.2"
+    "bcrypt": "^5.0.1",
+    "cors": "^2.8.5",
+    "dotenv": "^10.0.0",
+    "express": "^4.18.2",
+    "jsonwebtoken": "^8.5.1",
+    "mysql2": "^2.3.3",
+    "sequelize": "^6.6.5"
+  },
+  "keywords": [],
+  "devDependencies": {
+    "nodemon": "^2.0.12"
   }
 }
