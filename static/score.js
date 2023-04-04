@@ -4,6 +4,29 @@ const staffLineSpacing = 20;
 const symbolSpacing = 20;
 const barCount = 7;
 const imgRatio = {"whole_note": 320/176, "treble_clef": 87/238, "time_signature_4_4": 134/329, "whole_rest": 232/479};
+const userId2 = localStorage.getItem('userId');
+let scoreId = localStorage.getItem('scoreId');
+if (scoreId === null) {
+    console.log('scoreId is not defined');
+  } else {
+    console.log(scoreId);
+    fetch(`/scores/${scoreId}`)
+    .then(response => response.json())
+    .then(data => {
+      console.log(data);
+      let scoreJson = data.data.json;
+      console.log(scoreJson);
+      if (scoreJson) {
+        let symbolList = JSON.parse(scoreJson);
+        myStaff.fromJson(symbolList);
+      } else {
+        console.log('Le score JSON est vide ou non défini');
+      }
+    })
+    .catch(error => console.error(error));
+  }
+
+
 
 /* pour créer une ligne avec des coordonnées */
 class Line {
@@ -233,12 +256,7 @@ class Staff {
         this.horPlaceForNextSymbol = 0;
 
         this.draw(ctx);
-        if (symbolList.length == 0) {
-            this.initEmpty();
-        }
-        else {
-            this.fromJson(symbolList);
-        }
+        this.fromJson(symbolList);
     }
 
     draw(ctx) {
@@ -271,6 +289,7 @@ class Staff {
     }
 
     addNote(noteFigure, noteValue, idxInStaff = -1) {
+        console.log('addNote', noteFigure, noteValue, idxInStaff);
         if (idxInStaff == -1) {
             let note = new Note(noteFigure, noteValue, this, this.horPlaceForNextSymbol);
             this.addSymbol(note);
@@ -348,11 +367,14 @@ class Staff {
     }
 
     fromJson(symbolList) {
+        if (!Array.isArray(symbolList)) {
+            console.error('fromJson requires an array as argument');
+            throw new Error('fromJson requires an array as argument');
+          }
         for (let i = 0; i < symbolList.length; i++) {
             let nextSymbol = symbolList[i];
             if (nextSymbol["type"] == "clef") {
                 this.addClef(nextSymbol["name"]);
-                console.log(this.symbols);
             }
             if (nextSymbol["type"] == "timeSignature") {
                 this.addTimeSignature(nextSymbol["name"]);
@@ -367,6 +389,7 @@ class Staff {
                         noteValue = allNoteValues[j];
                     }
                 }
+                console.log('fromJson: addNote', wholeNote, noteValue);
                 this.addNote(wholeNote, noteValue);
             }
             if (nextSymbol["type"] == "rest") {
@@ -379,7 +402,6 @@ class Staff {
         let symbolList = [];
         for (let i = 0; i < this.symbols.length; i++) {
             let symbol = this.symbols[i];
-            console.log(symbol);
             if (symbol instanceof Clef) {
                 symbolList.push({"type": "clef", "name": symbol.name})
             }
@@ -442,6 +464,31 @@ function addNoteOnClick(x, y) {
         }
     }
 }
+
+async function saveScore() {
+    const name = document.querySelector('#SName').value;
+    const userId = userId2;
+    const json = myStaff.toJson();
+  
+    const data = { name, userId, json };
+  
+    try {
+      const response = await fetch(`/scores`, {
+        method: 'POST',
+        headers: {
+          'Content-Type': 'application/json'
+        },
+        body: JSON.stringify(data)
+      });
+  
+      const result = await response.json();
+      console.log(result);
+      // Traiter la réponse de la requête
+    } catch (error) {
+      console.error(error);
+      // Traiter l'erreur de la requête
+    }
+  }
 
 /* supprime une note ou non en fonction de la position du clic */
 function deleteNoteOnClick(x, y) {

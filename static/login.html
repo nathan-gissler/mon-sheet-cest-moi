@@ -4,32 +4,32 @@
     <meta charset="utf-8" />
     <title>Login</title>
     <link rel="stylesheet" href="style.css" />
-    <script data-main="login" src="require.js" ></script>
 </head>
 <body>
    
     <!--On fabrique ici les boutons qui vont permettre l'utilisateur de se connecter-->
-  <form method  ="POST">
-    <div class="card2">
-      <h2>Pas encore de profil?</h2>
-        <label for="uname"><p>Pseudo:</p></label>
-  <input type="text" placeholder="Entrer le pseudo" id= "uname" name="uname" required>
-  <label for="psw"><p>Mot de passe:</p></label>
-  <input type="password" placeholder="Entrer le mot de passe" id="psw" name="psw" required>
-  <label for="psw"><p>Vérifier le mot de passe:</p></label>
-  <input type="password" placeholder="Entrez le meme mot de passe" id="psw2" name="psw2" required>
-  <button type="submit" onclick="Createaccount()">Créer un compte</button>
-    </div>
+    <form method="POST" action="/users/signup">
+      <div class="card2">
+          <h2>Pas encore de profil?</h2>
+          <label for="uname"><p>Pseudo:</p></label>
+          <input type="text" placeholder="Entrer le pseudo" id= "uname" name="username" required>
+          <label for="psw"><p>Mot de passe:</p></label>
+          <input type="password" placeholder="Entrer le mot de passe" id="psw" name="password" required>
+          <label for="psw"><p>Vérifier le mot de passe:</p></label>
+          <input type="password" placeholder="Entrez le meme mot de passe" id="psw2" name="password2" required>
+          <button type="submit">Créer un compte</button>
+      </div>
   </form>
 
-  <form method="POST">
+  <form method="POST" action="/users/login">
+    <input type="hidden" name="id" value="{{userId}}">
     <div class="card2">
       <h2>Déjà un profil?</h2>
-        <label for="uname"><p>Pseudo:</p></label>
-  <input type="text" placeholder="Entrer le pseudo" id= "cuname" name="cuname" required>
-  <label for="psw"><p>Mot de passe:</p></label>
-  <input type="password" placeholder="Entrer le mot de passe" id="cpsw" name="cpsw" required>
-  <button type="submit" onclick="Login()">Se connecter</button>
+      <label for="cuname"><p>Pseudo:</p></label>
+      <input type="text" placeholder="Entrer le pseudo" id="cuname" name="username" required>
+      <label for="cpsw"><p>Mot de passe:</p></label>
+      <input type="password" placeholder="Entrer le mot de passe" id="cpsw" name="password" required>
+      <button type="submit">Se connecter</button>
     </div>
   </form>
   </body>

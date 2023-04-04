@@ -1,0 +1,58 @@
+<!DOCTYPE html>
+<html>
+
+<head>
+  <meta charset="utf-8" />
+  <title>Mon sheet c'est moi</title>
+  <link rel="stylesheet" href="style.css" />
+  <script>
+    localStorage.setItem('userId', NULL);
+    localStorage.setItem('scoreId', NULL);
+    const urlParams = new URLSearchParams(window.location.search);
+    const userId = urlParams.get('id');
+    localStorage.setItem('userId', userId);
+    console.log(userId);
+    </script>
+</head>
+
+<body>
+  <a href="saves.html" class="main-link">
+    <article class="card">
+      <div>
+        <p class="sub-heading">
+          Ebauche
+          <time datetime="2020-03-20">
+            12 Octobre 2022 </time>
+        </p>
+        <h2>Les partitions sauvegardées</h2>
+        <p>
+          Vous pouvez ici retrouver vos partitions enregistrées ou les partitions qui vous ont été partagées par
+          d'autres utilisateurs
+        </p>
+      </div>
+      <div class="tags">
+        <span class="tag">Mon sheet c'est moi</span>
+      </div>
+    </article>
+  </a>
+  <a href="score.html" + userId class="main-link">
+    <article class="card">
+      <div>
+        <p class="sub-heading">
+          Ebauche
+          <time datetime="2020-03-20">
+            12 Octobre 2022 </time>
+        </p>
+        <h2>Créer une nouvelle partition</h2>
+        <p>
+          Laissez libre cours à votre imagination avec une partition vierge!
+        </p>
+      </div>
+      <div class="tags">
+        <span class="tag">Mon sheet c'est moi</span>
+      </div>
+    </article>
+  </a>
+</body>
+
+</html>

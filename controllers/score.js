@@ -50,11 +50,14 @@ exports.addScore = async (req, res) => {
         if (score !== null) {
             return res.status(409).json({ message: `La partition ${name} exite déjà !` })
         }
+        
+        const jsonString = JSON.stringify(json)
 
         // Création de la partition
-        score = await Score.create(req.body)
+        score = await Score.create({ name, userId: userId, json: jsonString })
         return res.json({ message: 'Partition créée', data: score })
     }catch(err){
+        console.log(err);
         return res.status(500).json({ message: 'Database Error', error: err })
     }
 }

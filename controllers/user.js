@@ -1,44 +1,48 @@
 /*** Import des module nécessaires */
+const db = require('../db.config.js');
+const User = db.User
 const bcrypt = require('bcrypt')
-
-const DB = require('../db.config')
-const User = DB.User
-
 /*** Routage de la ressource User */
 
-exports.getAllScores = (req, res) => {
+exports.getAllUsers = (req, res) => {
     User.findAll()
         .then(users => res.json({ data: users }))
         .catch(err => res.status(500).json({ message: 'Database Error', error: err }))
 }
 
 exports.getUser = async (req, res) => {
-    let userId = parseInt(req.params.id)
-
-    // Vérification si le champ id est présent et cohérent
-    if (!userId) {
-        return res.json(400).json({ message: 'Missing Parameter' })
+    const { username, password } = req.body
+  
+    // Vérification si le champ username est présent et cohérent
+    if (!username) {
+      return res.status(400).json({ message: 'Missing Parameter' })
     }
-
-    try{
-        // Récupération de l'utilisateur et vérification
-        let user = await User.findOne({ where: { id: userId }, attributes: ['username','id']})
-        if (user === null) {
-            return res.status(404).json({ message: 'This user does not exist !' })
-        }
-
-        return res.json({ data: user })
-    }catch(err){
-        return res.status(500).json({ message: 'Database Error', error: err })
-    }    
-}
+  
+    try {
+      const user = await User.findOne({ where: { username }, attributes: ['username', 'id', 'password'] })
+  
+      if (!user) {
+        return res.status(404).json({ message: 'This user does not exist !' })
+      }
+  
+      // Comparaison des mots de passe
+      const match = await bcrypt.compare(password, user.password)
+      if (!match) {
+        return res.status(401).json({ message: 'Invalid password' })
+      }
+  
+      return res.redirect(`../static/postlogin.html?id=${user.id}`)
+    } catch (err) {
+      return res.status(500).json({ message: 'Database Error', error: err })
+    }
+  }
 
 exports.addUser = async (req, res) => {
-    const { username, password } = req.body
+    const { username, password, password2 } = req.body
 
     // Validation des données reçues
-    if (!username || !password) {
-        return res.status(400).json({ message: 'Missing Data' })
+    if (!username || !password || password !== password2) {
+        return res.status(400).json({ message: 'Missing or incorrect data' })
     }
 
     try{
@@ -48,21 +52,17 @@ exports.addUser = async (req, res) => {
             return res.status(409).json({ message: `L'utilisateur ${username} existe déjà !` })
         }
 
-        // Hashage du mot de passe utilisateur
-        // let hash = await bcrypt.hash(password, parseInt(process.env.BCRYPT_SALT_ROUND))
-        // req.body.password = hash
-
-        // Céation de l'utilisateur
-        let userc = await User.create(req.body)
-        return res.json({ message: 'User Created', data: userc })
+        // Création de l'utilisateur
+        let userc = await User.create({username: username, password: password})
+        
+        return res.redirect('../static/postlogin.html?id=${user.id}') // redirection vers la page index.html
 
     }catch(err){
-        if(err.name == 'SequelizeDatabaseError'){
-            res.status(500).json({ message: 'Database Error', error: err })
-        }
-        res.status(500).json({ message: 'Hash Process Error', error: err})        
+        console.error(err); // Affiche l'erreur dans la console pour le débogage
+        return res.status(500).json({ message: 'Error', error: err.message })
     }
 }
+
 
 exports.updateUser = async (req, res) => {
     let userId = parseInt(req.params.id)
